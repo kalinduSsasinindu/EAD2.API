@@ -1,4 +1,4 @@
-package com.example.ead2project.config;
+package com.example.ead2project.repository.config;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;

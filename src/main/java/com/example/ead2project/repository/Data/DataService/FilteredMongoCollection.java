@@ -1,60 +1,50 @@
 package com.example.ead2project.repository.Data.DataService;
 
 import com.example.ead2project.repository.Data.Entities.Base.IUserOwnedEntity;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.bson.conversions.Bson;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class FilteredMongoCollection<T> {
-
-    private final MongoTemplate mongoTemplate;
-    private final Class<T> entityClass;
+    private final MongoCollection<T> collection;
+    private final HttpServletRequest request;
     
-    public FilteredMongoCollection(MongoTemplate mongoTemplate, Class<T> entityClass) {
-        this.mongoTemplate = mongoTemplate;
-        this.entityClass = entityClass;
-    }
-
     private String getClientId() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
-            // Implement your logic to get user ID from JWT or session
-            return attributes.getRequest().getHeader("X-User-Id");
-        }
-        return null;
+        return request.getHeader("X-User-Id");
     }
-
-    private Query applyUserFilter(Query query) {
+    
+    private Bson applyUserFilter(Bson filter) {
         String clientId = getClientId();
-        if (clientId != null && IUserOwnedEntity.class.isAssignableFrom(entityClass)) {
-            query.addCriteria(Criteria.where("clientId").is(clientId));
+        if (clientId != null && IUserOwnedEntity.class.isAssignableFrom(collection.getDocumentClass())) {
+            Bson userFilter = Filters.eq("ClientId", clientId);
+            return Filters.and(filter, userFilter);
         }
-        return query;
+        return filter;
     }
 
-    public Optional<T> findOne(Query query) {
-        Query filteredQuery = applyUserFilter(query);
-        return Optional.ofNullable(mongoTemplate.findOne(filteredQuery, entityClass));
+    public Optional<T> findOne(Bson filter) {
+        return Optional.ofNullable(collection.find(applyUserFilter(filter)).first());
     }
 
-    public long count(Query query) {
-        Query filteredQuery = applyUserFilter(query);
-        return mongoTemplate.count(filteredQuery, entityClass);
+    public long count(Bson filter) {
+        return collection.countDocuments(applyUserFilter(filter));
     }
 
-    public List<T> find(Query query) {
-        Query filteredQuery = applyUserFilter(query);
-        filteredQuery.addCriteria(Criteria.where("isDeleted").is(false));
-        return mongoTemplate.find(filteredQuery, entityClass);
+    public List<T> find(Bson filter) {
+        Bson combinedFilter = Filters.and(
+            applyUserFilter(filter),
+            Filters.eq("isDeleted", false)
+        );
+        return collection.find(combinedFilter).into(new ArrayList<>());
     }
 
     public void insertOne(T document) {
@@ -62,46 +52,34 @@ public class FilteredMongoCollection<T> {
         if (clientId != null && document instanceof IUserOwnedEntity) {
             ((IUserOwnedEntity) document).setClientId(clientId);
         }
-        mongoTemplate.insert(document);
+        collection.insertOne(document);
     }
 
-    public UpdateResult updateOne(Query query, Update update) {
-        Query filteredQuery = applyUserFilter(query);
-        return mongoTemplate.updateFirst(filteredQuery, update, entityClass);
+    public UpdateResult updateOne(Bson filter, Bson update) {
+        return collection.updateOne(applyUserFilter(filter), update);
     }
 
-    public T findOneAndUpdate(Query query, Update update) {
-        Query filteredQuery = applyUserFilter(query);
-        return mongoTemplate.findAndModify(filteredQuery, update, entityClass);
+    public DeleteResult deleteOne(Bson filter) {
+        return collection.deleteOne(applyUserFilter(filter));
     }
 
-    public DeleteResult deleteOne(Query query) {
-        Query filteredQuery = applyUserFilter(query);
-        return mongoTemplate.remove(filteredQuery, entityClass);
-    }
-
-    public UpdateResult softDeleteOne(Query query) {
-        Query filteredQuery = applyUserFilter(query);
-        Update update = new Update()
-                .set("isDeleted", true)
-                .set("deletedAt", LocalDateTime.now());
-        return mongoTemplate.updateFirst(filteredQuery, update, entityClass);
+    public UpdateResult softDeleteOne(Bson filter) {
+        Bson update = Updates.combine(
+            Updates.set("IsDeleted", true),
+            Updates.set("DeletedAt", LocalDateTime.now())
+        );
+        return collection.updateOne(applyUserFilter(filter), update);
     }
 
     public void insertMany(List<T> documents) {
         String clientId = getClientId();
         if (clientId != null) {
-            documents.forEach(document -> {
-                if (document instanceof IUserOwnedEntity) {
-                    ((IUserOwnedEntity) document).setClientId(clientId);
+            documents.forEach(doc -> {
+                if (doc instanceof IUserOwnedEntity) {
+                    ((IUserOwnedEntity) doc).setClientId(clientId);
                 }
             });
         }
-        mongoTemplate.insertAll(documents);
-    }
-
-    public T replaceOne(Query query, T replacement) {
-        Query filteredQuery = applyUserFilter(query);
-        return mongoTemplate.findAndReplace(filteredQuery, replacement);
+        collection.insertMany(documents);
     }
 }
