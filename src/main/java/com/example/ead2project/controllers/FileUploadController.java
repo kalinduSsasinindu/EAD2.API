@@ -1,10 +1,11 @@
 package com.example.ead2project.controllers;
 
-import com.example.ead2project.services.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.ead2project.repository.blob.CloudinaryService;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

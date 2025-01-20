@@ -20,7 +20,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class MongoDBContext {
     
     private final MongoDatabase database;
-    private final HttpServletRequest httpServletRequest;
 
     // Collections
     private final FilteredMongoCollection<Customer> customers;
@@ -30,11 +29,9 @@ public class MongoDBContext {
     private final FilteredMongoCollection<User> users;
     private final FilteredMongoCollection<Tag> tags;
   
-    public MongoDBContext(@Value("${spring.data.mongodb.uri}") String connectionString,
-                         @Value("${spring.data.mongodb.database}") String databaseName) {
+    public MongoDBContext(@Value("${spring.data.mongodb.uri}") String connectionString) {
         MongoClient client = MongoClients.create(connectionString);
-        this.database = client.getDatabase(databaseName);
-        this.httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        this.database = client.getDatabase("your-database-name");
 
         // Initialize collections
         this.customers = getFilteredCollection("Customer", Customer.class);
@@ -49,7 +46,15 @@ public class MongoDBContext {
         return database;
     }
 
+    private HttpServletRequest getRequest() {
+        try {
+            return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private <T> FilteredMongoCollection<T> getFilteredCollection(String collectionName, Class<T> entityClass) {
-        return new FilteredMongoCollection<>(database.getCollection(collectionName, entityClass), httpServletRequest);
+        return new FilteredMongoCollection<>(database.getCollection(collectionName, entityClass), getRequest());
     }
 } 
