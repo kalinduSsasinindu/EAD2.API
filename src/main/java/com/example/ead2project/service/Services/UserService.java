@@ -1,4 +1,4 @@
-package com.example.ead2project.service.Services;
+/*package com.example.ead2project.service.Services;
 
 import com.example.ead2project.dto.*;
 import com.example.ead2project.entity.*;
@@ -32,4 +32,4 @@ public class UserService {
     private String baseUrl;
 
     // Main methods will follow...
-} 
+} */
