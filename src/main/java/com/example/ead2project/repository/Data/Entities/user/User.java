@@ -20,8 +20,6 @@ public class User {
     @Field("Email")
     private String email;
     
-    @Field("UserIntegration")
-    private UserIntegration userIntegration;
     
     @Field("isDeleted")
     private boolean isDeleted;
