@@ -7,8 +7,8 @@ public class UserServiceDto {
     private String id;
     private String clientId;
     private String email;
-    private UserIntegrationServiceDto userIntegration;
     private boolean isDeleted;
+    private UserIntegrationServiceDto userIntegration;
     private StoreSettingsServiceDto storeSettings;
     private PaymentSettingsServiceDto paymentSettings;
 } 

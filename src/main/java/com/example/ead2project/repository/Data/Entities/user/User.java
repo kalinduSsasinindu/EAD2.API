@@ -20,10 +20,13 @@ public class User {
     @Field("Email")
     private String email;
     
-    
     @Field("isDeleted")
     private boolean isDeleted;
     
+    @Field("UserIntegration")
+    private UserIntegration userIntegration;
+    
+
     @Field("StoreSettings")
     private StoreSettings storeSettings;
     
