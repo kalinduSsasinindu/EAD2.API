@@ -16,4 +16,9 @@ public class Utility {
         }
         return null;
     }
+
+    public static String getUserIdFromClaims(HttpServletRequest httpRequest) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserIdFromClaims'");
+    }
 }

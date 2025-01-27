@@ -59,7 +59,7 @@ public class FilteredMongoCollection<T> {
         return collection.find(combinedFilter);
     }
 
-    public AggregateIterable<T> aggregate() {
+    public AggregateIterable<T> aggregate(List<Bson> list) {
         return collection.aggregate(new ArrayList<>());
     }
 

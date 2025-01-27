@@ -22,10 +22,7 @@ public class User {
     
     @Field("isDeleted")
     private boolean isDeleted;
-    
-    @Field("UserIntegration")
-    private UserIntegration userIntegration;
-    
+        
 
     @Field("StoreSettings")
     private StoreSettings storeSettings;

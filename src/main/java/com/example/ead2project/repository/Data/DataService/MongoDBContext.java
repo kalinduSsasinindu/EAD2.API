@@ -53,7 +53,9 @@ public class MongoDBContext {
             return null;
         }
     }
-
+    public FilteredMongoCollection<Product> getProducts() {
+        return products;
+    }
     private <T> FilteredMongoCollection<T> getFilteredCollection(String collectionName, Class<T> entityClass) {
         return new FilteredMongoCollection<>(database.getCollection(collectionName, entityClass), getRequest());
     }
