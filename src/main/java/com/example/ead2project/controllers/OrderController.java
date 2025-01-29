@@ -1,4 +1,4 @@
-package com.example.ead2project.controller;
+package com.example.ead2project.controllers;
 
 
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.ead2project.repository.Data.Entities.Order.LineItem;
 import com.example.ead2project.repository.Data.Entities.Order.Order;
+import com.example.ead2project.repository.Data.Entities.Order.PaymentInfo;
+import com.example.ead2project.repository.Data.Entities.Order.ShippingAddress;
 import com.example.ead2project.repository.Data.Entities.Order.TimeLineDetails;
 import com.example.ead2project.repository.Data.Entities.Search.OrderSearchResponse;
 import com.example.ead2project.serviceInterface.interfaces.IOrderService;
@@ -51,28 +54,9 @@ public class OrderController {
         return ResponseEntity.ok(countList);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/GetOrdersWithTracking")
-    public ResponseEntity<?> getOrderPagesWithTracking(@RequestBody PortalSearchWebDto searchParams) {
-        logger.info("get orders info");
-        logger.debug("get orders debug");
-        var filteredRes = orderService.getOrdersWithTracking(
-                searchParams.getStart(), 
-                searchParams.getEnd(), 
-                searchParams.getQueryText());
-        return ResponseEntity.ok(filteredRes);
-    }
+   
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody Order order) {
-        orderService.createOrder(order);
-        orderService.addTimelineAsync(order.getId(), TimeLineDetails.builder()
-                .createdAt(LocalDateTime.now())
-                .comment("Order placed successfully")
-                .build());
-        return ResponseEntity.ok(Map.of("id", order.getId()));
-    }
+    
 
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/timeline")
@@ -123,34 +107,7 @@ public class OrderController {
         return success ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{id}/paymentAmounts")
-    public ResponseEntity<?> updatePaymentAmounts(@PathVariable String id, @RequestBody OrderPaymentWebDto updateDto) {
-        if (updateDto == null) {
-            return ResponseEntity.badRequest().body("Update data is required.");
-        }
-        
-        Order existingOrder = orderService.getById(id);
-        if (existingOrder == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var subtotalPrice = updateDto.getSubtotalPrice() != null ? 
-                updateDto.getSubtotalPrice() : existingOrder.getSubtotalPrice();
-        var totalLineItemsPrice = updateDto.getTotalLineItemsPrice() != null ? 
-                updateDto.getTotalLineItemsPrice() : existingOrder.getTotalLineItemsPrice();
-        var totalPrice = updateDto.getTotalPrice() != null ? 
-                updateDto.getTotalPrice() : existingOrder.getTotalPrice();
-        var totalShippingPrice = updateDto.getTotalShippingPrice() != null ? 
-                updateDto.getTotalShippingPrice() : existingOrder.getTotalShippingPrice();
-        var totalDiscountPrice = updateDto.getTotalDiscountPrice() != null ? 
-                updateDto.getTotalDiscountPrice() : existingOrder.getTotalDiscountPrice();
-
-        orderService.update(id, subtotalPrice, totalLineItemsPrice, totalPrice, 
-                totalShippingPrice, totalDiscountPrice);
-
-        return ResponseEntity.ok().build();
-    }
+    
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/order")
@@ -159,16 +116,7 @@ public class OrderController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/shopifysync")
-    public ResponseEntity<?> syncShopify(HttpServletRequest request) {
-        User user = userService.getUserByUserId(request);
-        if (user != null) {
-            var eCommerceSettings = userService.getEcommerceSettingByType(user, ECommTypes.SHOPIFY.getValue());
-            orderService.syncOrdersAsync(eCommerceSettings);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().body("E commerce integration is not setup");
-    }
+    
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{orderId}/add-tag")

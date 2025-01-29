@@ -53,92 +53,110 @@ public class OrderService implements IOrderService {
 
     @Override
     public CompletableFuture<Void> createOrder(Order order) {
+        return null;
         // Implementation
     }
 
     @Override
     public CompletableFuture<Void> update(String id, List<LineItem> lineItems) {
+        return null;
         // Implementation
     }
 
     @Override
     public CompletableFuture<Void> update(String id, ShippingAddress shippingAddress) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> update(String id, PaymentInfo paymentInfo) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> updateFulfillStatus(String id, String fulfillStatus) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> updatePaymentStatus(String id, String paymentStatus, BigDecimal amount, String paymentMethod) {
         // Implementation
+        return null;
     }
 
     @Override
     public Order getById(String id) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<List<Order>> getByIds(List<String> ids) {
         // Implementation
+        return null;
     }
 
     @Override
     public List<OrderSearchResponse> getOrdersByStatus(String fulfillmentStatus) {
         // Implementation
+        return null;
     }
 
     @Override
     public PagedOrdersResultServiceDto getOrdersWithTracking(int start, int end, String queryText) {
         // Implementation
+        return null;
     }
 
     @Override
     public boolean deleteProductAsync(String id) {
         // Implementation
+        return true;
     }
 
     @Override
     public boolean cancelOrderAsync(String id) {
         // Implementation
+        return true;
     }
 
     @Override
     public boolean update(String id, BigDecimal subtotalPrice, BigDecimal totalLineItemsPrice, 
             BigDecimal totalPrice, BigDecimal totalShippingPrice, BigDecimal totalDiscountPrice) {
         // Implementation
+        return true;
     }
 
     @Override
     public List<OrderSearchResponse> searchOrdersAsync(String query) {
         // Implementation
+        return null;
     }
 
     @Override
     public List<OrderCountItemServiceDto> getOrdersUpUntil(LocalDateTime upUntil) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> addTagToOrder(String productId, List<String> tagNames) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> addTimelineAsync(String orderId, TimeLineDetails details) {
         // Implementation
+        return null;
     }
 
     @Override
     public CompletableFuture<Void> updateStatus(String id, boolean isDrafted) {
         // Implementation
+        return null;
     }
 } 

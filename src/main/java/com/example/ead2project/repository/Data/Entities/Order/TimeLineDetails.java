@@ -10,4 +10,8 @@ public class TimeLineDetails {
     private String comment;
     private List<String> images;
     private List<String> imgUrls;
+    public static Object builder() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'builder'");
+    }
 } 
